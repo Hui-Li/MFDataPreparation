@@ -18,6 +18,22 @@ namespace mf {
         fout.close();
     }
 
+    template <typename T>
+    void writeKeyMap(const string keyMapFilePath, const unordered_map<T, int> &key_map, const bool addOneForID=true) {
+        // create meta file
+        ofstream fout;
+        fout.open(keyMapFilePath);
+        fout << "original id,new id" << endl;
+        for(auto it = key_map.begin(); it != key_map.end(); ++it){
+            if(addOneForID){
+                fout << it->first << "," << it->second + 1 << endl;
+            } else {
+                fout << it->first << "," << it->second << endl;
+            }
+        }
+        fout.close();
+    }
+
     void writeBinaryFile(const string path, char *content, const int size) {
 
         std::ofstream ValueOut(path);
@@ -55,9 +71,7 @@ namespace mf {
         const int size_of_int = sizeof(int);
 
         // csr, csc and coo for cumf are processed on (item,user,rating)
-        int *coo_row_idx = new int [ratings.size()];
-        int *coo_col_idx = nullptr;
-        float *coo_score_idx = nullptr;
+        int *coo_row_idx = new int[ratings.size()];
 
         float *csr_score_float = new float[ratings.size()];
         int *csr_row_ptr = new int[itemNum+1];
@@ -66,23 +80,39 @@ namespace mf {
         csr_row_ptr[0] = 0;
         int currentItemID = 0;
         int ratingNumForCurrentRow = 0;
+        int plus_num = 0;
 
         for (int ratingIndex = 0; ratingIndex < ratings.size(); ratingIndex++) {
             Rating &rating = ratings[ratingIndex];
-            csr_score_float[ratingIndex] = stod(rating.rating);
+            csr_score_float[ratingIndex] = stof(rating.rating);
             csr_col_idx[ratingIndex] = rating.userID;
             coo_row_idx[ratingIndex] = rating.itemID;
 
-            while(currentItemID!=rating.itemID){
+            if (rating.itemID != currentItemID) {
+                // It is possible that one item has no ratings in the test data.
+                while (currentItemID < rating.itemID) {
+                    csr_row_ptr[currentItemID + 1] = csr_row_ptr[currentItemID] + ratingNumForCurrentRow;
+                    plus_num += ratingNumForCurrentRow;
+                    currentItemID++;
+                    ratingNumForCurrentRow = 0;
+                }
+                ratingNumForCurrentRow++;
+            } else {
+                ratingNumForCurrentRow++;
+            }
+        }
+
+        // It is possible that one item has no ratings in the test data.
+        if (currentItemID != itemNum) {
+            while (currentItemID < itemNum) {
                 csr_row_ptr[currentItemID + 1] = csr_row_ptr[currentItemID] + ratingNumForCurrentRow;
+                plus_num += ratingNumForCurrentRow;
                 currentItemID++;
                 ratingNumForCurrentRow = 0;
             }
-
-            ratingNumForCurrentRow++;
         }
 
-        csr_row_ptr[itemNum] = csr_row_ptr[itemNum-1] + ratingNumForCurrentRow;
+        assert(plus_num==ratings.size());
 
         // Transpose CSR into CCS matrix
         float *ccs_rating_scores = new float[ratings.size()];
@@ -98,6 +128,8 @@ namespace mf {
                 k++;
             }
         }
+
+        assert(k==ratings.size());
 
         for (int i = 0; i < ratings.size(); i++) {
             ccs_col_ptr[csr_col_idx[i] + 1]++;
@@ -150,8 +182,8 @@ namespace mf {
 
         if(cumf_prefix.compare("R_test_")==0){
 
-            coo_col_idx = new int[ratings.size()];
-            coo_score_idx = new float[ratings.size()];
+            int *coo_col_idx = new int[ratings.size()];
+            float *coo_score_idx = new float[ratings.size()];
 
             int i =0;
             for(auto rating:ratings){

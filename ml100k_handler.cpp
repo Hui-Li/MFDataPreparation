@@ -20,17 +20,16 @@ void transformIds(const string inputPath, unordered_map<string, int> &userIdMap,
             continue;
         }
         par.clear();
-        boost::split(par, line, boost::is_any_of("::"));
-
+        boost::split(par, line, boost::is_any_of("\t"));
 
         auto itr = userIdMap.find(par[0]);
         if (itr == userIdMap.end()) {
             userIdMap.insert(std::make_pair(par[0], userIdMap.size()));
         }
 
-        itr = itemIdMap.find(par[2]);
+        itr = itemIdMap.find(par[1]);
         if (itr == itemIdMap.end()) {
-            itemIdMap.insert(std::make_pair(par[2], itemIdMap.size()));
+            itemIdMap.insert(std::make_pair(par[1], itemIdMap.size()));
         }
     }
     fin.close();
@@ -55,17 +54,17 @@ void split(const string dataPath, const string outputFolder, const string metaPa
             continue;
         }
         par.clear();
-        boost::split(par, line, boost::is_any_of("::"));
+        boost::split(par, line, boost::is_any_of("\t"));
 
         int userID = userIdMap.find(par[0])->second;
-        int itemID = itemIdMap.find(par[2])->second;
+        int itemID = itemIdMap.find(par[1])->second;
         users[userID].userID = userID;
         users[userID].ratedItemIDs.push_back(itemID);
-        users[userID].ratings[itemID] = par[4];
+        users[userID].ratings[itemID] = par[2];
 
         items[itemID].itemID = itemID;
         items[itemID].raterIDs.push_back(userID);
-        items[itemID].ratings[userID] = par[4];
+        items[itemID].ratings[userID] = par[2];
 
         ratingNum++;
     }
@@ -119,15 +118,16 @@ void split(const string dataPath, const string outputFolder, const string metaPa
         }
     }
 
+    writeMeta(outputFolder + metaPath, userIdMap.size(), itemIdMap.size(), trainRatings.size(), testRatings.size(), outputCSRTrainPath, outputCSRTestPath);
+
     writeMatrix(trainRatings, userIdMap.size(), itemIdMap.size(), outputFolder, outputMMCTrainPath, outputCSRTrainPath, "R_train_");
 
     writeMatrix(testRatings, userIdMap.size(), itemIdMap.size(), outputFolder, outputMMCTestPath, outputCSRTestPath, "R_test_");
 
-    writeMeta(outputFolder + metaPath, userIdMap.size(), itemIdMap.size(), trainRatings.size(), testRatings.size(), outputCSRTrainPath, outputCSRTestPath);
-
     writeKeyMap(outputFolder + userIDMapPath, userIdMap);
 
     writeKeyMap(outputFolder + itemIDMapPath, itemIdMap);
+
 }
 
 
@@ -150,8 +150,8 @@ int main(int argc, char const *argv[]){
     desc.add_options()
             ("help", "produce help message")
             ("percentage", po::value<double>(&percentage)->default_value(0.8), "percentage of training ratings")
-            ("rating_path", po::value<string>(&filePath)->default_value("../raw_data/ml10m/ratings.dat"), "path to original rating file")
-            ("o_folder", po::value<string>(&outputFolder)->default_value("../data/ml10m/"), "path to output folder")
+            ("rating_path", po::value<string>(&filePath)->default_value("../raw_data/ml-100k/u.data"), "path to original rating file")
+            ("o_folder", po::value<string>(&outputFolder)->default_value("../data/ml-100k/"), "path to output folder")
             ("meta_path", po::value<string>(&metaPath)->default_value("meta"), "name of meta file")
             ("user_id_map_path", po::value<string>(&userIDMapPath)->default_value("user_id_map.dat"), "name of user id map file")
             ("item_id_map_path", po::value<string>(&itemIDMapPath)->default_value("item_id_map.dat"), "name of item id map file")

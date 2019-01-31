@@ -83,7 +83,7 @@ int convertFile(const string &input_path, const string &outputFolder, const stri
 
     fin.close();
 
-    writeMatrix(ratings, uid_map.size(), mid_map.size(), outputFolder, outputMMCFileName, outputCSRFileName, cumf_prefix, true);
+    writeMatrix(ratings, uid_map.size(), mid_map.size(), outputFolder, outputMMCFileName, outputCSRFileName, cumf_prefix);
 
     return line_counter - skip_line;
 }
@@ -94,6 +94,8 @@ int main(int argc, char const *argv[]) {
     string trainPath;
     string testPath;
     string metaPath;
+    string userIDMapPath;
+    string itemIDMapPath;
     string outputMMCTrainPath;
     string outputMMCTestPath;
     string outputCSRTrainPath;
@@ -106,6 +108,8 @@ int main(int argc, char const *argv[]) {
             ("i_test", po::value<string>(&testPath)->default_value("../raw_data/netflix/netflix_mme"), "path to original testing file")
             ("o_folder", po::value<string>(&outputFolder)->default_value("../data/netflix/"), "path to output folder")
             ("meta_path", po::value<string>(&metaPath)->default_value("meta"), "name of meta file")
+            ("user_id_map_path", po::value<string>(&userIDMapPath)->default_value("user_id_map.dat"), "name of user id map file")
+            ("item_id_map_path", po::value<string>(&itemIDMapPath)->default_value("item_id_map.dat"), "name of item id map file")
             ("o_mmc_train", po::value<string>(&outputMMCTrainPath)->default_value("train.mmc"), "name of output MMC training file")
             ("o_mmc_test", po::value<string>(&outputMMCTestPath)->default_value("test.mmc"), "name of output MMC testing file")
             ("o_csr_train", po::value<string>(&outputCSRTrainPath)->default_value("train.csr"), "name of output CSR training file")
@@ -130,6 +134,9 @@ int main(int argc, char const *argv[]) {
     num_test = convertFile(testPath, outputFolder, outputMMCTestPath, outputCSRTestPath, uid_map, mid_map, 3, "R_test_");
 
     writeMeta(outputFolder + metaPath, uid_map.size(), mid_map.size(), num_train, num_test, outputCSRTrainPath, outputCSRTestPath);
+
+    writeKeyMap(outputFolder + userIDMapPath, uid_map);
+    writeKeyMap(outputFolder + itemIDMapPath, mid_map);
 
     return 0;
 }

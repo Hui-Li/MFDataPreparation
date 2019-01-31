@@ -40,7 +40,7 @@ void transformIds(const string inputPath, unordered_map<string, int> &userIdMap,
 
 }
 
-void split(const string dataPath, const string outputFolder, const string metaPath, const string outputMMCTrainPath,
+void split(const string dataPath, const string outputFolder, const string metaPath, const string userIDMapPath, const string itemIDMapPath, const string outputMMCTrainPath,
 		   const string outputMMCTestPath, const string outputCSRTrainPath,
 		   const string outputCSRTestPath,
 		   const double percentage, unordered_map<string, int> &userIdMap, unordered_map<string, int> &itemIdMap) {
@@ -85,7 +85,7 @@ void split(const string dataPath, const string outputFolder, const string metaPa
     vector<Rating> trainRatings;
     vector<Rating> testRatings;
 
-	// each user has at least rated 20 items
+	// each user has at least rated 20 items in the original data
 	// first guarantee that each item at least appears in train set once
 	for (int i = 0; i < items.size(); i++) {
 		Item &item = items[i];
@@ -136,6 +136,9 @@ void split(const string dataPath, const string outputFolder, const string metaPa
 
 	writeMeta(outputFolder + metaPath, userIdMap.size(), itemIdMap.size(), trainRatings.size(), testRatings.size(), outputCSRTrainPath, outputCSRTestPath);
 
+	writeKeyMap(outputFolder + userIDMapPath, userIdMap);
+
+	writeKeyMap(outputFolder + itemIDMapPath, itemIdMap);
 }
 
 
@@ -144,6 +147,8 @@ int main(int argc, char const *argv[]){
 	string outputFolder;
 	string filePath;
 	string metaPath;
+	string userIDMapPath;
+	string itemIDMapPath;
 	string outputMMCTrainPath;
 	string outputMMCTestPath;
 	string outputCSRTrainPath;
@@ -159,6 +164,8 @@ int main(int argc, char const *argv[]){
 			("rating_path", po::value<string>(&filePath)->default_value("../raw_data/ml20m/ratings.csv"), "path to original rating file")
 			("o_folder", po::value<string>(&outputFolder)->default_value("../data/ml20m/"), "path to output folder")
 			("meta_path", po::value<string>(&metaPath)->default_value("meta"), "name of meta file")
+			("user_id_map_path", po::value<string>(&userIDMapPath)->default_value("user_id_map.dat"), "name of user id map file")
+			("item_id_map_path", po::value<string>(&itemIDMapPath)->default_value("item_id_map.dat"), "name of item id map file")
 			("o_mmc_train", po::value<string>(&outputMMCTrainPath)->default_value("train.mmc"), "name of output MMC training file")
 			("o_mmc_test", po::value<string>(&outputMMCTestPath)->default_value("test.mmc"), "name of output MMC testing file")
 			("o_csr_train", po::value<string>(&outputCSRTrainPath)->default_value("train.csr"), "name of output CSR training file")
@@ -179,7 +186,7 @@ int main(int argc, char const *argv[]){
 	unordered_map<string, int> itemIdMap;
 	transformIds(filePath, userIdMap, itemIdMap);
 
-	split(filePath, outputFolder, metaPath, outputMMCTrainPath, outputMMCTestPath, outputCSRTrainPath,
+	split(filePath, outputFolder, metaPath, userIDMapPath, itemIDMapPath, outputMMCTrainPath, outputMMCTestPath, outputCSRTrainPath,
 		  outputCSRTestPath, percentage, userIdMap, itemIdMap);
 
 	return 0;
