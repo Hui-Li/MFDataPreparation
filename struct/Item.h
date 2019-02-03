@@ -5,6 +5,7 @@
 
 class Item {
 public:
+    mutex locker;
     int itemID;
     vector<int> raterIDs;
     unordered_map<int, string> ratings;

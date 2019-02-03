@@ -84,7 +84,8 @@ namespace mf {
 
         for (int ratingIndex = 0; ratingIndex < ratings.size(); ratingIndex++) {
             Rating &rating = ratings[ratingIndex];
-            csr_score_float[ratingIndex] = stof(rating.rating);
+            // In case there are numbers with scientific notation
+            csr_score_float[ratingIndex] = strtof(rating.rating.c_str(), nullptr);
             csr_col_idx[ratingIndex] = rating.userID;
             coo_row_idx[ratingIndex] = rating.itemID;
 
@@ -188,7 +189,8 @@ namespace mf {
             int i =0;
             for(auto rating:ratings){
                 coo_col_idx[i] = rating.userID;
-                coo_score_idx[i] = stod(rating.rating);
+                // In case there are numbers with scientific notation
+                coo_score_idx[i] = strtof(rating.rating.c_str(), nullptr);
                 i++;
             }
 
@@ -273,7 +275,9 @@ namespace mf {
 
         for (int ratingIndex = 0; ratingIndex < ratings.size(); ratingIndex++) {
             Rating &rating = ratings[ratingIndex];
-            csr_score_double[ratingIndex] = stod(rating.rating);
+
+            // In case there are numbers with scientific notation
+            csr_score_double[ratingIndex] = strtod(rating.rating.c_str(), nullptr);
             csr_col_idx[ratingIndex] = rating.itemID;
 
             while(currentUserID!=rating.userID){

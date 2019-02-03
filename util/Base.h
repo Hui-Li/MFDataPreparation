@@ -8,11 +8,14 @@
 #include <algorithm>
 #include <unordered_map>
 #include <map>
+#include <mutex>
+#include <thread>
 
 using std::cout;
 using std::endl;
 using std::cerr;
 
+using std::mutex;
 using std::string;
 using std::vector;
 using std::map;
