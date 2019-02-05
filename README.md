@@ -10,7 +10,7 @@ In order to make ids consecutive and start with 1/0 in MMC/CSR file, we have rem
 - CMake 2.8
 - GCC 5.4
 - Boost 1.63 
-- Zlib 1.2.11
+- Zlib 1.2.11  (only for HugeWiki)
 
 To install CMake, Boost and Zlib, try:
 
@@ -43,3 +43,4 @@ Some of the links may become invalid due to privacy issue or the shutdown of the
 5. Yahoo! Music: [https://webscope.sandbox.yahoo.com/catalog.php?datatype=r](https://webscope.sandbox.yahoo.com/catalog.php?datatype=r)
 6. HugeWiki: [http://www.select.cs.cmu.edu/code/graphlab/datasets/](http://www.select.cs.cmu.edu/code/graphlab/datasets/)
 7. Last.FM: [https://grouplens.org/datasets/hetrec-2011/](https://grouplens.org/datasets/hetrec-2011/)
+8. Yelp: [https://www.kaggle.com/c/yelp-recsys-2013](https://www.kaggle.com/c/yelp-recsys-2013) or [https://www.yelp.com/dataset/challenge](https://www.yelp.com/dataset/challenge)

@@ -102,7 +102,7 @@ void split(const string dataPath, const string outputFolder, const string metaPa
 
     double newPercentage = (ceil(ratingNum * percentage) - trainNum) / (ratingNum - trainNum + 0.0);
 
-    for (User user:users) {
+    for (User &user:users) {
         vector<int> &ratedItemIDs = user.ratedItemIDs;
         unordered_map<int, string> &ratings = user.ratings;
         random_shuffle(ratedItemIDs.begin(), ratedItemIDs.end());

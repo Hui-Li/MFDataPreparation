@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project(DataHandler)
+project(MFDataHandler)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -std=c++11 -DNDEBUG -pthread -march=native -ftree-vectorize")
 
@@ -30,7 +30,7 @@ set(struct
 add_library(lib SHARED ${util} ${struct})
 set_target_properties(lib PROPERTIES LINKER_LANGUAGE CXX)
 
-link_libraries(lib ${Boost_LIBRARIES} ${ZLIB_LIBRARIES})
+link_libraries(lib ${Boost_LIBRARIES})
 
 add_executable(lastFM_handler lastFM_handler.cpp)
 add_executable(ml100k_handler ml100k_handler.cpp)
@@ -38,3 +38,4 @@ add_executable(ml10m_handler ml10m_handler.cpp)
 add_executable(ml20m_handler ml20m_handler.cpp)
 add_executable(netflix_handler netflix_handler.cpp)
 add_executable(yahoo_handler yahoo_handler.cpp)
+add_executable(yelp_handler yelp_handler.cpp)

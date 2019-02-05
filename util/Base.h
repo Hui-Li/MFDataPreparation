@@ -15,6 +15,8 @@ using std::cout;
 using std::endl;
 using std::cerr;
 
+using std::make_pair;
+using std::pair;
 using std::mutex;
 using std::string;
 using std::vector;

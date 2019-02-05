@@ -6,45 +6,60 @@
 #include "util/ThreadUtil.h"
 #include <algorithm>
 
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/foreach.hpp>
 
 using namespace mf;
+using boost::property_tree::ptree;
 
-//inline double sigmoid(double x) {
-//    return 1.0 / (1.0 + exp(-x));
-//}
-
-void transformIds(const string inputPath, unordered_map<string, int> &userIdMap, unordered_map<string, int> &itemIdMap) {
-
+void transformIds(const string ratingFilePath, vector<Rating> &ratings,
+                 unordered_map<string, int> &userIdMap, unordered_map<string, int> &itemIdMap) {
     string line;
-    ifstream fin;
-    fin.open(inputPath.c_str());
+    ifstream fin(ratingFilePath.c_str());
 
-    vector<string> par;
-    bool first_line = true;
+    stringstream ss;
+
     while (getline(fin, line)) {
-        if (first_line) {
-            first_line = false;
-            continue;
-        }
         if (line.length() == 0) {
             continue;
         }
-        par.clear();
-        boost::split(par, line, boost::is_any_of("\t"));
 
-        auto itr = userIdMap.find(par[0]);
-        if (itr == userIdMap.end()) {
-            userIdMap.insert(std::make_pair(par[0], userIdMap.size()));
+        ss.clear();
+        ss << line;
+
+        boost::property_tree::ptree pt;
+        boost::property_tree::read_json(ss, pt);
+
+        string user_id_str = pt.get<string>("user_id");
+        string business_id_str = pt.get<string>("business_id");
+        string score = pt.get<string>("stars");
+
+        int user_id, business_id;
+
+        auto iter = userIdMap.find(user_id_str);
+        if (iter == userIdMap.end()) {
+            user_id = userIdMap.size();
+            userIdMap[user_id_str] = user_id;
+        } else {
+            user_id = iter->second;
         }
 
-        itr = itemIdMap.find(par[1]);
-        if (itr == itemIdMap.end()) {
-            itemIdMap.insert(std::make_pair(par[1], itemIdMap.size()));
+        auto iter2 = itemIdMap.find(business_id_str);
+        if (iter2 == itemIdMap.end()) {
+            business_id = itemIdMap.size();
+            itemIdMap[business_id_str] = business_id;
+        } else {
+            business_id = iter2->second;
         }
+
+        ratings.push_back(Rating(user_id, business_id, score));
     }
+
     fin.close();
 
 }
+
 
 void split(const int num_of_thread, const string dataPath, const string outputFolder, const string metaPath, const string userIDMapPath, const string itemIDMapPath, const string outputMMCTrainPath,
            const string outputMMCTestPath, const string outputCSRTrainPath,
@@ -54,35 +69,38 @@ void split(const int num_of_thread, const string dataPath, const string outputFo
     vector<User> users(userIdMap.size());
     vector<Item> items(itemIdMap.size());
 
-    vector<string> par;
-
     int ratingNum = 0;
 
-    bool first_line = true;
     ifstream fin(dataPath.c_str());
+
+    stringstream ss;
+
     while (getline(fin, line)) {
-        if (first_line) {
-            first_line = false;
-            continue;
-        }
+
         if (line.length() == 0) {
             continue;
         }
-        par.clear();
-        boost::split(par, line, boost::is_any_of("\t"));
 
-        int userID = userIdMap.find(par[0])->second;
-        int itemID = itemIdMap.find(par[1])->second;
+        ss.clear();
+        ss << line;
 
-        string rating = par[2];
+        boost::property_tree::ptree pt;
+        boost::property_tree::read_json(ss, pt);
+
+        string user_id_str = pt.get<string>("user_id");
+        string business_id_str = pt.get<string>("business_id");
+        string score = pt.get<string>("stars");
+
+        int userID = userIdMap.find(user_id_str)->second;
+        int businessID = itemIdMap.find(business_id_str)->second;
 
         users[userID].userID = userID;
-        users[userID].ratedItemIDs.push_back(itemID);
-        users[userID].ratings[itemID] = rating;
+        users[userID].ratedItemIDs.push_back(businessID);
+        users[userID].ratings[businessID] = score;
 
-        items[itemID].itemID = itemID;
-        items[itemID].raterIDs.push_back(userID);
-        items[itemID].ratings[userID] = rating;
+        items[businessID].itemID = businessID;
+        items[businessID].raterIDs.push_back(userID);
+        items[businessID].ratings[userID] = score;
 
         ratingNum++;
     }
@@ -265,7 +283,7 @@ void split(const int num_of_thread, const string dataPath, const string outputFo
 int main(int argc, char const *argv[]){
 
     string outputFolder;
-    string filePath;
+    string ratingFilePath;
     string metaPath;
     string userIDMapPath;
     string itemIDMapPath;
@@ -275,7 +293,6 @@ int main(int argc, char const *argv[]){
     string outputCSRTestPath;
     int num_of_thread;
 
-    // 80% of each user's ratings are used for training
     double percentage;
 
     po::options_description desc("Allowed options");
@@ -283,8 +300,8 @@ int main(int argc, char const *argv[]){
             ("help", "produce help message")
             ("percentage", po::value<double>(&percentage)->default_value(0.8), "percentage of training ratings")
             ("num_of_thread", po::value<int>(&num_of_thread)->default_value(8), "number of threads")
-            ("rating_path", po::value<string>(&filePath)->default_value("../raw_data/lastFM/user_artists.dat"), "path to original rating file")
-            ("o_folder", po::value<string>(&outputFolder)->default_value("../data/lastFM/"), "path to output folder")
+            ("rating_path", po::value<string>(&ratingFilePath)->default_value("../raw_data/yelp/yelp_training_set_review.json"), "path to rating file")
+            ("o_folder", po::value<string>(&outputFolder)->default_value("../data/yelp/"), "path to output folder")
             ("meta_path", po::value<string>(&metaPath)->default_value("meta"), "name of meta file")
             ("user_id_map_path", po::value<string>(&userIDMapPath)->default_value("user_id_map.dat"), "name of user id map file")
             ("item_id_map_path", po::value<string>(&itemIDMapPath)->default_value("item_id_map.dat"), "name of item id map file")
@@ -304,11 +321,17 @@ int main(int argc, char const *argv[]){
 
     srand(time(NULL));
 
+    vector<Rating> ratings;
     unordered_map<string, int> userIdMap;
     unordered_map<string, int> itemIdMap;
-    transformIds(filePath, userIdMap, itemIdMap);
 
-    split(num_of_thread, filePath, outputFolder, metaPath, userIDMapPath, itemIDMapPath, outputMMCTrainPath, outputMMCTestPath, outputCSRTrainPath,
+    transformIds(ratingFilePath, ratings, userIdMap, itemIdMap);
+
+    cout << "rating number: " << ratings.size() << endl;
+    cout << "user number: " << userIdMap.size() << endl;
+    cout << "bussiness number: " << itemIdMap.size() << endl;
+
+    split(num_of_thread, ratingFilePath, outputFolder, metaPath, userIDMapPath, itemIDMapPath, outputMMCTrainPath, outputMMCTestPath, outputCSRTrainPath,
           outputCSRTestPath, percentage, userIdMap, itemIdMap);
 
     return 0;
