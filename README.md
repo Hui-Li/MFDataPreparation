@@ -1,4 +1,4 @@
-# MFDataTransfer
+# MFDataPreparation
 
 Tools which transforms public recommender system data to MMC file (i.e., <user_id, item_id, rating> triple file) and [CSR file](https://en.wikipedia.org/wiki/Sparse_matrix#Compressed_sparse_row_.28CSR.2C_CRS_or_Yale_format.29) used in several matrix factorization libraries. For MMC files, id starts with 1. For CSR file, id starts with 0. In addition, DataHandler will generate data under folder "cumf_als" for [cumf_als](https://github.com/cuMF/cumf_als) library (except for hugewiki). 
 
