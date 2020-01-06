@@ -4,15 +4,14 @@ project(MFDataPreparation)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -std=c++11 -DNDEBUG -pthread -march=native -ftree-vectorize")
 
 find_package(Boost COMPONENTS serialization program_options system filesystem iostreams)
-
 if(NOT ${Boost_FOUND})
-    SET(BOOST_ROOT ~/local) # default
+    SET(BOOST_ROOT /opt/libs/boost) # default
     SET(Boost_NO_SYSTEM_PATHS ON) # force to use own build
-    find_package(Boost COMPONENTS serialization program_options system filesystem iostreams REQUIRED)
+    find_package(Boost COMPONENTS program_options system filesystem REQUIRED)
 endif(NOT ${Boost_FOUND})
-
 if(Boost_FOUND)
     message(STATUS "Boost found")
+    message(STATUS ${Boost_LIBRARIES})
     include_directories(${Boost_INCLUDE_DIR})
     link_libraries(${Boost_LIBRARIES})
 endif(Boost_FOUND)
@@ -34,6 +33,7 @@ link_libraries(lib ${Boost_LIBRARIES})
 
 add_executable(lastFM_handler lastFM_handler.cpp)
 add_executable(ml100k_handler ml100k_handler.cpp)
+add_executable(ml1m_handler ml1m_handler.cpp)
 add_executable(ml10m_handler ml10m_handler.cpp)
 add_executable(ml20m_handler ml20m_handler.cpp)
 add_executable(netflix_handler netflix_handler.cpp)

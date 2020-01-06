@@ -36,11 +36,12 @@ program --help
 ## Public Data Sets for Recemmender Systems
 Some of the links may become invalid due to privacy issue or the shutdown of the website, but it is easy to find other download links in internet. 
 
-1. MovieLens 100K: [http://grouplens.org/datasets/movielens/](http://grouplens.org/datasets/movielens/) 
-2. MovieLens 10M: [http://grouplens.org/datasets/movielens/](http://grouplens.org/datasets/movielens/) 
-3. MovieLens 20M: [http://grouplens.org/datasets/movielens/](http://grouplens.org/datasets/movielens/) 
-4. Netflix: [http://www.select.cs.cmu.edu/code/graphlab/datasets/](http://www.select.cs.cmu.edu/code/graphlab/datasets/) 
-5. Yahoo! Music: [https://webscope.sandbox.yahoo.com/catalog.php?datatype=r](https://webscope.sandbox.yahoo.com/catalog.php?datatype=r)
-6. HugeWiki: [http://www.select.cs.cmu.edu/code/graphlab/datasets/](http://www.select.cs.cmu.edu/code/graphlab/datasets/)
-7. Last.FM: [https://grouplens.org/datasets/hetrec-2011/](https://grouplens.org/datasets/hetrec-2011/)
-8. Yelp: [https://www.kaggle.com/c/yelp-recsys-2013](https://www.kaggle.com/c/yelp-recsys-2013) or [https://www.yelp.com/dataset/challenge](https://www.yelp.com/dataset/challenge)
+1. [MovieLens 100K](http://files.grouplens.org/datasets/movielens/ml-100k.zip) 
+2. [MovieLens 1M](http://files.grouplens.org/datasets/movielens/ml-1m.zip) 
+3. [MovieLens 10M](http://files.grouplens.org/datasets/movielens/ml-10m.zip) 
+4. [MovieLens 20M](http://files.grouplens.org/datasets/movielens/ml-20m.zip) 
+5. [Netflix](http://www.select.cs.cmu.edu/code/graphlab/datasets/) 
+6. [Yahoo! Music](https://webscope.sandbox.yahoo.com/catalog.php?datatype=r)
+7. [HugeWiki](http://www.select.cs.cmu.edu/code/graphlab/datasets/)
+8. [Last.FM](https://grouplens.org/datasets/hetrec-2011/)
+9. [Kaggle Yelp](https://www.kaggle.com/c/yelp-recsys-2013) or [Yelp Challenge](https://www.yelp.com/dataset/challenge)
