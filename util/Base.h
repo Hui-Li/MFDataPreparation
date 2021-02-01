@@ -26,6 +26,7 @@ using std::ofstream;
 using std::getline;
 using std::stringstream;
 using std::unordered_map;
+using std::unordered_set;
 
 ////////////////// Boost //////////////////////
 
